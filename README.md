@@ -656,4 +656,115 @@ http.get({
     `response.pause()`:暂停接收数据和发送事件，方便实现下载功能
     `response.resume()`:把暂停的状态恢复
 
+**express框架--最稳定的一个web开发框架**
+
+express框架提供了许多功能：
+
+- 路由控制
+- 模板解析支持
+- 动态视图
+- 用户会话
+- CSRF保护
+- 静态文件服务
+- 错误控制器
+- 访问日志
+- 缓存
+- 插件支持
+
+1.安装express：`npm install -g express`
+2.建立工程：`express ejs express-test`
+3.进入到`cd express-test`执行`DEBUG=express-test:* ./bin/www`，访问`localhost:3000`
+4.express通过require来直接获取
+5.routes是一个文件夹形式的本地模块，即`./routes/index.js`，他的功能是为指定的路径组织返回内容，相当于mvc架构中的控制器
+6.`app.set`是express的餐食设置工具，接收一个key和一个value
+，参数具体如下：
+- basepath：基础机制，通常用于res.redirect()跳转
+- views：视图文件的目录，存放模板文件
+- port：指定的端口
+- view engine：视图模板引擎
+- view options：全局视图参数对象
+- view cache：启用视图缓存
+- case sensitive routes：路劲区分大小写
+- jsonp callback：开启透明的jsonp支持
+
+
+### 路由控制
+
+- 工作原理：浏览器发送请求，由路由控制接受，根据不同的路径定向到不同的服务器，控制器处理用户的具体的请求，可能会访问数据库中的对象，即模型部分，生成视图的hmtl，最后再由控制器返回给浏览器，完成一次请求
+
+- 创建路由规则：
+```
+//参数一：
+app.get('/user', routes.user);
+//index.js中增加函数user
+exports.user = function(req, res) {
+	res.send('this is user ');
+}
+//参数二：
+app.get('/user', function(req, res) {
+	res.send('this is user');
+})
+```
+
+- 路径匹配：
+```
+//第一种：
+app.get('/user/:username', function(req, res){
+	res.send('this is user ' + req.params.username);
+})
+//第二种：使用正则，访问的时候用req.params[0]
+app.get(/\user\/([^V]+)V?, callback)
+```
+
+- REST风格的路由规则：表征状态转移，是一种基于http协议的网络应用的接口风格，http定义了8个标准方法：
+1.GET：请求获取指定资源  获取
+2.POST：向指定资源提交数据  新增
+3.DELETE：请求服务器删除指定资源  删除
+4.PUT：请求服务器存储一个资源  更新
+5.HEAD：请求指定资源的响应头
+6.TRACE：回显服务器数到的请求，主要用户测试或诊断
+7.CONNECT:HTTP协议中预留给能够将连接改为管道方式的代理服务器
+8.OPTIONS：返回服务器支持的HTTP请求方法
+
+还有一个所有方法：
+   `app.all(path, callback(req, res, next))`
+
+```
+router.all('/:username', function(req, res, next) {
+	next();//控制权的转移
+	res.send('use all type to return username :' + req.params.username);
+});
+
+router.get('/:username', function(req, res, next) {
+  // res.send('respond with a resource': req.params.username);
+  console.log(req.params);
+  res.send('use get type to return username: ' + req.params.username);
+});
+```
+
+**模板引擎**
+
+方法：
+```
+//指定模板存放目录
+app.set('views', _dirname + '/views');
+//设置引擎类型
+app.set('views engine', 'ejs');
+//调用
+res.render('index', {title:'tree'})接收两个参数，第一个是模板名称，第二个是传给模板的数据
+ejs标签：
+- <% code %> javascript代码
+- <%= code %> 显示替换过HTML特殊字符的内容
+- <%- body %> 显示原始HTML内容
+```
+
+页面布局：
+[nodejs中使用ejs作为模板引擎如何使用layout](https://github.com/milixie/Blog/issues/2)
+
+
+片段视图：
+[nodejs中ejs作为模板引擎的时候如何使用片段视图遍历](https://github.com/milixie/Blog/issues/3)
+
+视图助手：
+[nodejs中视图助手的使用](https://github.com/milixie/Blog/issues/4)
 
