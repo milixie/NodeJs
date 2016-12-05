@@ -768,3 +768,185 @@ ejs标签：
 视图助手：
 [nodejs中视图助手的使用](https://github.com/milixie/Blog/issues/4)
 
+
+
+
+
+# NodeJs 学习笔记
+
+### 对比 URL vs URI
+
+URI -- 字符串格式规范
+URL -- 具体的网址
+
+### url -- 解析 URL 的好帮手
+
+#### url.parse('url', true/false, true/false) -- 将 URL 解析成一个 object
+
+- 第一个参数是 URL 地址
+- 第二个参数默认是 false，如果写成 true 则表示解析出的 query 格式为 object 格式
+- 第三个参数默认是 false，如果写成 true 时，如果传入的url 是‘//imooc.com/list’这样的，则会将 imooc.com 还是当成主机，如果不写第三个参数，则 host: null
+
+```
+url.parse('http://www.imooc.com:8080/error/noexists?search=eee&a=b#f1')
+Url {
+  protocol: 'http:',
+  slashes: true,
+  auth: null,
+  host: 'www.imooc.com',
+  port: '8080',
+  hostname: 'www.imooc.com',
+  hash: '#f1',
+  search: '?search=eee&a=b',
+  query: 'search=eee&a=b',  //如果第二个参数是 true，则 query:{search: 'eee', a: 'b'}
+  pathname: '/error/noexists',
+  path: '/error/noexists?search=eee&a=b',
+  href: 'http://www.imooc.com:8080/error/noexists?search=eee&a=b' }
+```
+#### url.format({obj}) -- 将一个 object 转换成一个完整的 URL
+```
+  url.format({
+  protocol: 'http:',
+  slashes: true,
+  auth: null,
+  host: 'www.imooc.com',
+  port: '8080',
+  hostname: 'www.imooc.com',
+  hash: '#f1',
+  search: '?search=eee&a=b',
+  query: 'search=eee&a=b',
+  pathname: '/error/noexists',
+  path: '/error/noexists?search=eee&a=b',
+  href: 'http://www.imooc.com:8080/error/noexists?search=eee&a=b' })
+  结果：'http://www.imooc.com:8080/error/noexists?search=eee&a=b#f1'
+```
+
+#### url.resolve('首页地址 hostname', '路径 path')
+
+```
+url.resolve('http://imooc.com', '/list')
+```
+### querystring
+
+#### 序列化
+querystring.stringify(obj, ',', ':')
+
+- 第一个参数 obj
+- 第二个参数 连接符样式定义，不加则默认是&
+- 第三个参数 分隔符样式定义，不加则默认是=
+
+```
+> querystring.stringify({name: 'mili', age: 22}, ',', ':')
+'name:mili,age:22'
+```
+
+#### 反序列化
+querysting.parse('str', ',', ':', 0)
+
+- 第一个参数 字符串
+- 第二个参数 连接符样式
+- 第三个参数 分隔符样式
+- 第四个参数 如果没有则默认是有字符串限制的，但是如果写 0 则表示没有限制
+
+```
+> querystring.parse('name:mili,age:22', ',', ':')
+{ name: 'mili', age: '22' }
+```
+
+#### 转义
+
+```
+querystring.escape('好好')
+'%E5%A5%BD%E5%A5%BD'
+
+```
+#### 反转义
+
+```
+querystring.unescape('%E5%A5%BD%E5%A5%BD')
+'好好'
+
+```
+
+### http 知识基本课程
+
+- http 是一种协议
+- http 客户端发起请求，创建端口
+- http 服务器在端口监听客户端请求
+- http 服务器向客户端返回状态和内容
+
+域名解析： 
+- chrome 搜索自身 DNS 缓存记录
+- 如果么有找到，则搜索操作系统自身的 DNS 缓存
+- 如果还是没有找到，则读取本地的 host 文件
+- 如果没有找到，则浏览器发起一个 DNS 的系统调用
+		1.宽带运营商服务器查看本身缓存
+		2.没有找到，则运营商服务器发起一个迭代 DNS 解析的请求
+		3.找到了，则运营商服务器吧结果返回操作系统内核同事缓存起来，操作系统内核吧结果返回浏览器，最终浏览器拿到了 www.sohu.com 的对应的 IP 地址
+
+- 浏览器获得域名对应的IP 地址后，发起 http 的三次握手
+
+- TCP/IP链接建立起来，浏览器可以向服务器发送 http 请求
+
+- 服务端接受到请求，根据路径参数，经过后端的一些处理，把处理后的一个结果的数据返回给浏览器，比如请求是一个网页，则会把完整的 HTML 页面代码返回给浏览器
+
+- 浏览器拿到 HTML 的页面代码了，里面的 js 和 css 等静态资源，同样也是 http 请求，然后就重复上面的步骤
+
+- 浏览器拿到的全部资源对页面进行渲染，页面就完全展示出来啦
+
+
+http: 请求和响应，都是包含着请求头和请求体
+
+请求方法：
+- get：请求获取资源
+- post：提交资源
+- put：更新资源
+- delete：删除资源
+- HEAD： 发送请求获取资源
+- trace：
+- options
+
+状态码：
+- 1xx： 表示请求已经接收正在处理
+- 2xx： 请求成功接收处理了
+- 3xx： 重定向，进行更进一步的操作
+- 4xx： 客户端错误，请求有语法错误或无法实现
+- 5xx：服务端错误
+
+常用的状态码：
+- 200： ok
+- 400： 客户端请求有语法错误，服务器端不能理解
+- 401：请求没有授权
+- 403：服务端收到请求，但是拒绝为它服务，可能是没有权限
+- 404：没有找到
+- 500：服务器端发生了不可预期的错误 
+- 503：服务器端不能处理你的请求
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
